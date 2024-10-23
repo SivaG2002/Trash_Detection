@@ -120,7 +120,7 @@ from PIL import Image
 from tensorflow.keras.models import load_model
 import time
 # Load your trained model
-model = load_model('C:\\Users\\Siva G Nair\\OneDrive\\Documents\\dl  projects\\Trash-Detection\\assets\\models\\model.h5')
+model = load_model('assets/models/model.h5')
 
 
 def preprocess_image(img):
