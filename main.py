@@ -845,16 +845,7 @@ def documentation_page():
         unsafe_allow_html=True)
 
 
-    df = pd.read_csv('C:\\Users\\Siva G Nair\\PycharmProjects\\pythonProject\\Project\\project3\\assets\\models\\eng_dataset.csv')
-    csv = df.to_csv(index=False)
 
-
-    st.download_button(
-        label="  Download",
-        data=csv,
-        file_name="downloaded_data.csv",
-        mime="text/csv"
-    )
 
 
     st.markdown(
