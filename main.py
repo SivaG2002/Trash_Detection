@@ -408,7 +408,7 @@ from geopy.geocoders import Nominatim
 
 
 # Twilio credentials
-account_sid = AC066c96df90833060eb10cfaa8d978deb)
+account_sid = 'AC066c96df90833060eb10cfaa8d978deb'
 auth_token = '728d23a2fb9a14d00291ce1b1b21879e'
 client = Client(account_sid, auth_token)
 
