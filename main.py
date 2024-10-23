@@ -582,7 +582,7 @@ def code_page():
 
 
 
-    notebook_path = 'C:\\Users\\Siva G Nair\\OneDrive\\Documents\\dl  projects\\Trash-Detection\\assets\\images\\1.ipynb'
+    notebook_path = 'assets\images\1.ipynb'
     with open(notebook_path, 'r', encoding='utf-8') as f:
         notebook_content = nbformat.read(f, as_version=4)
         html_exporter = HTMLExporter()
