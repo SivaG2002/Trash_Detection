@@ -2,11 +2,6 @@ import streamlit as st
 import pickle
 import base64
 
-
-
-def configure():
-    load_dotenv()
-
   
 
  
