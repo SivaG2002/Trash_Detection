@@ -1,2 +1,1 @@
-os
-python-dotenv
+streamlit
