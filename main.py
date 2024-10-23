@@ -2,6 +2,21 @@ import streamlit as st
 import pickle
 import base64
 import joblib
+from dotenv import load_dotenv
+import os
+
+
+def configure():
+    load_dotenv()
+
+  
+
+ 
+
+   
+
+
+
 
 def set_bg_from_url(image_url):
     st.markdown(
@@ -400,8 +415,8 @@ from geopy.geocoders import Nominatim
 from ass import sid,auth
 
 # Twilio credentials
-account_sid = ass.sid
-auth_token = ass.auth
+account_sid = os.getenv('sid')
+auth_token = os.getenv('auth')
 client = Client(account_sid, auth_token)
 
 # Function to send WhatsApp message with location link
