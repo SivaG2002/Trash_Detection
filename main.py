@@ -107,7 +107,7 @@ import numpy as np
 from keras.models import load_model
 from PIL import Image
 
-model = load_model('my_model.h5')  
+
 
 
 
@@ -120,7 +120,7 @@ from PIL import Image
 from tensorflow.keras.models import load_model
 import time
 # Load your trained model
-model = load_model('C:\\Users\\Siva G Nair\\OneDrive\\Documents\\dl  projects\\project4\\assets\\models\\model.h5')
+model = load_model('C:\\Users\\Siva G Nair\\OneDrive\\Documents\\dl  projects\\Trash-Detection\\assets\\models\\model.h5')
 
 
 def preprocess_image(img):
@@ -573,7 +573,7 @@ def code_page():
 
 
 
-    notebook_path = 'C:\\Users\\Siva G Nair\\OneDrive\\Documents\\dl  projects\\project4\\assets\\images\\1.ipynb'
+    notebook_path = 'C:\\Users\\Siva G Nair\\OneDrive\\Documents\\dl  projects\\Trash-Detection\\assets\\images\\1.ipynb'
     with open(notebook_path, 'r', encoding='utf-8') as f:
         notebook_content = nbformat.read(f, as_version=4)
         html_exporter = HTMLExporter()
