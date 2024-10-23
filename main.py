@@ -1,9 +1,7 @@
 import streamlit as st
 import pickle
 import base64
-import joblib
-from dotenv import load_dotenv
-import os
+
 
 
 def configure():
@@ -412,11 +410,11 @@ from twilio.rest import Client
 import folium
 from streamlit_folium import st_folium
 from geopy.geocoders import Nominatim
-from ass import sid,auth
+
 
 # Twilio credentials
-account_sid = os.getenv('sid')
-auth_token = os.getenv('auth')
+account_sid =${{ secrets.sid }}
+auth_token = ${{ secrets.auth }}
 client = Client(account_sid, auth_token)
 
 # Function to send WhatsApp message with location link
