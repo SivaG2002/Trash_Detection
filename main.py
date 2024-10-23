@@ -408,8 +408,8 @@ from geopy.geocoders import Nominatim
 
 
 # Twilio credentials
-account_sid =${{ secrets.sid }}
-auth_token = ${{ secrets.auth }}
+account_sid = os.getenv('SID')
+auth_token = os.getenv('auth')
 client = Client(account_sid, auth_token)
 
 # Function to send WhatsApp message with location link
