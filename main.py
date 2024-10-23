@@ -399,8 +399,8 @@ from streamlit_folium import st_folium
 from geopy.geocoders import Nominatim
 
 # Twilio credentials
-account_sid = 'AC066c96df90833060eb10cfaa8d978deb'
-auth_token = '4a4dad8f39684d89709aae3087f67e4d'
+account_sid = ass.sid
+auth_token = ass.auth
 client = Client(account_sid, auth_token)
 
 # Function to send WhatsApp message with location link
