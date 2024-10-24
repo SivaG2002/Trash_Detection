@@ -253,59 +253,61 @@ def upload_image_prediction(model):
 
 
 
-import time
+import streamlit as st
 import cv2
 import numpy as np
 from PIL import Image
+from streamlit_webrtc import VideoTransformerBase, webrtc_streamer
+
+# Custom video transformer class for processing the video stream
+class VideoTransformer(VideoTransformerBase):
+    def __init__(self, model):
+        self.model = model
+
+    def transform(self, frame):
+        img = frame.to_ndarray(format="bgr")
+        
+        # Extract Region of Interest (ROI) for predictions
+        roi = img[100:400, 100:400]
+
+        # Perform prediction on the ROI
+        label, confidence = predict_class(Image.fromarray(roi), self.model)
+
+        # Display prediction results on the frame
+        cv2.rectangle(img, (100, 100), (400, 400), (0, 255, 0), 2)
+        cv2.putText(img, f"{label} (Confidence: {confidence:.2f})", 
+                    (100, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+
+        return img
 
 def real_time_detection(model):
     st.markdown('<h3 style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
 
-    # Initialize session_state values if not already set
-    if 'tracking' not in st.session_state:
-        st.session_state.tracking = False
+    # Add buttons for starting and stopping the webcam feed
+    start_button = st.button("Start Webcam")
+    stop_button = st.button("Stop Webcam")
 
-    # Webcam start/stop controls
-    start_button = st.button("Start Webcam", key="siva_key_1_start")
-    stop_button = st.button("Stop Webcam", key="siva_key_1_stop")
+    if start_button:
+        st.session_state.webcam_started = True
+    if stop_button:
+        st.session_state.webcam_started = False
 
-    if start_button and not st.session_state.tracking:
-        st.session_state.tracking = True
-        st.success("Webcam started.")
+    # Check the session state to control the WebRTC stream
+    if 'webcam_started' not in st.session_state:
+        st.session_state.webcam_started = False
 
-    if stop_button and st.session_state.tracking:
-        st.session_state.tracking = False
-        st.success("Webcam stopped.")
+    if st.session_state.webcam_started:
+        # Start WebRTC stream
+        webrtc_streamer(key="example", video_transformer=VideoTransformer(model))
+        st.info("WebRTC is streaming your webcam feed. Predictions are being made in real-time.")
+    else:
+        st.info("Webcam is stopped. Press 'Start Webcam' to begin.")
 
-    # Placeholder for displaying frames
-    frame_placeholder = st.empty()
+# Example of how to call the function in your main application
+# if __name__ == "__main__":
+#     model = load_your_model()  # Load your model here
+#     real_time_detection(model)
 
-    if st.session_state.tracking:
-        # Use Streamlit's camera input for real-time detection
-        camera_input = st.camera_input("Capture from your webcam", key="siva_key_1")
-
-        if camera_input:
-            try:
-                # Convert the camera input to a PIL image
-                img_pil = Image.open(camera_input)
-                frame_rgb = np.array(img_pil)
-
-                # Extract Region of Interest (ROI) for predictions
-                roi = frame_rgb[100:400, 100:400]
-
-                # Perform prediction on the ROI
-                label, confidence = predict_class(Image.fromarray(roi), model)
-
-                # Display prediction results on the frame
-                cv2.rectangle(frame_rgb, (100, 100), (400, 400), (0, 255, 0), 2)
-                cv2.putText(frame_rgb, f"{label} (Confidence: {confidence:.2f})", (100, 90), 
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
-
-                # Show the real-time video with predictions
-                frame_placeholder.image(frame_rgb, channels="RGB", use_column_width=True)
-
-            except Exception as e:
-                st.error(f"Error processing the webcam input: {e}")
 
 
 def capture_and_predict(model):
