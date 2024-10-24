@@ -291,7 +291,7 @@ def capture_and_predict(model):
 
 import time
 
-real_time_detection(model):
+def real_time_detection(model):
     st.markdown('<h3 class="title-gap" style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
 
     # Start webcam detection loop
