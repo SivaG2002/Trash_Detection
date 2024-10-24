@@ -256,80 +256,37 @@ def upload_image_prediction(model):
 def real_time_detection(model):
     st.markdown('<h3 class="title-gap" style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
 
-    start_button = st.button("Start Webcam")
-    stop_button = st.button("Stop Webcam")
+    # Use Streamlit's camera input for deployment compatibility
+    camera_input = st.camera_input("Capture from your webcam")
 
-    
-    if 'cap' not in st.session_state:
-        st.session_state.cap = None
-    if 'tracking' not in st.session_state:
-        st.session_state.tracking = False
-
-    
-    if start_button:
+    # Continue only if the user captures an image from the webcam
+    if camera_input:
         try:
-            if st.session_state.cap is None or not st.session_state.cap.isOpened():
-                st.session_state.cap = cv2.VideoCapture(0)  
-                st.session_state.tracking = True
-                st.success("Webcam started.")
-        except Exception as e:
-            st.error(f"Failed to start webcam: {e}")
-
- 
-    if stop_button:
-        try:
-            if st.session_state.cap is not None and st.session_state.cap.isOpened():
-                st.session_state.tracking = False
-                st.session_state.cap.release() 
-                st.session_state.cap = None
-                cv2.destroyAllWindows()  
-                st.success("Webcam stopped.")
-        except Exception as e:
-            st.error(f"Error while stopping the webcam: {e}")
-
-   
-    frame_placeholder = st.empty()
-
-  
-    if st.session_state.tracking and st.session_state.cap is not None and st.session_state.cap.isOpened():
-        try:
-            while st.session_state.tracking:
-                ret, frame = st.session_state.cap.read()
-                if not ret:
-                    st.error("Failed to read from webcam.")
-                    break
-
-               
-                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                roi = frame_rgb[100:400, 100:400] 
-                
-                try:
-                    label, confidence = predict_class(Image.fromarray(roi), model)
-                except Exception as e:
-                    st.error(f"Prediction error: {e}")
-                    break
-
-                
-                cv2.rectangle(frame_rgb, (100, 100), (400, 400), (0, 255, 0), 2)
-                cv2.putText(frame_rgb, f"{label} (Confidence: {confidence:.2f})", (100, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
-
-               
-                frame_placeholder.image(frame_rgb, channels="RGB", use_column_width=True)
-
-               
-                if not st.session_state.tracking:
-                    break
-
-        except Exception as e:
-            st.error(f"Error during webcam processing: {e}")
-        finally:
+            # Convert the camera input to a PIL image
+            img_pil = Image.open(camera_input)
             
+            # Convert the PIL image to a NumPy array for OpenCV processing
+            frame_rgb = np.array(img_pil)
+
+            # Extract the region of interest (ROI) as you had before
+            roi = frame_rgb[100:400, 100:400] 
+
+            # Run the model prediction on the ROI
             try:
-                if st.session_state.cap is not None:
-                    st.session_state.cap.release()
-                cv2.destroyAllWindows()
+                label, confidence = predict_class(Image.fromarray(roi), model)
             except Exception as e:
-                st.error(f"Error while releasing resources: {e}")
+                st.error(f"Prediction error: {e}")
+                return
+
+            # Draw bounding box and label with confidence on the frame
+            cv2.rectangle(frame_rgb, (100, 100), (400, 400), (0, 255, 0), 2)
+            cv2.putText(frame_rgb, f"{label} (Confidence: {confidence:.2f})", (100, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+
+            # Display the processed frame with detection and annotations
+            st.image(frame_rgb, channels="RGB", use_column_width=True)
+
+        except Exception as e:
+            st.error(f"Error processing the webcam input: {e}")
 
 
 # Feature 3: Capture Image from Webcam and Predict
