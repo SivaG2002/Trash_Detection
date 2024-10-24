@@ -276,15 +276,22 @@ def real_time_detection(model):
     start_button = st.button("Start Webcam", key="siva_key_1_start")
     stop_button = st.button("Stop Webcam", key="siva_key_1_stop")
 
-    if start_button:
+    if start_button and not st.session_state.tracking:
         st.session_state.tracking = True
         st.session_state.cap = cv2.VideoCapture(0)  # Initialize webcam
-        st.success("Webcam started.")
+
+        if not st.session_state.cap.isOpened():
+            st.error("Failed to open webcam.")
+            st.session_state.tracking = False  # Reset tracking if webcam fails to open
+            st.session_state.cap = None
+        else:
+            st.success("Webcam started.")
         
-    if stop_button:
+    if stop_button and st.session_state.tracking:
         st.session_state.tracking = False
         if st.session_state.cap is not None:
             st.session_state.cap.release()  # Release the webcam
+            st.session_state.cap = None
             cv2.destroyAllWindows()
         st.success("Webcam stopped.")
     
@@ -292,30 +299,33 @@ def real_time_detection(model):
     frame_placeholder = st.empty()
 
     while st.session_state.get('tracking', False):
-        ret, frame = st.session_state.cap.read()
+        if st.session_state.cap is not None:
+            ret, frame = st.session_state.cap.read()
 
-        if not ret:
-            st.error("Failed to capture from webcam.")
-            break
+            if not ret:
+                st.error("Failed to capture from webcam.")
+                break
 
-        # Convert frame to RGB for Streamlit and OpenCV processing
-        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            # Convert frame to RGB for Streamlit and OpenCV processing
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        # Extract Region of Interest (ROI) for predictions
-        roi = frame_rgb[100:400, 100:400]
+            # Extract Region of Interest (ROI) for predictions
+            roi = frame_rgb[100:400, 100:400]
 
-        # Perform prediction on the ROI
-        label, confidence = predict_class(Image.fromarray(roi), model)
+            # Perform prediction on the ROI
+            label, confidence = predict_class(Image.fromarray(roi), model)
 
-        # Display prediction results on the frame
-        cv2.rectangle(frame_rgb, (100, 100), (400, 400), (0, 255, 0), 2)
-        cv2.putText(frame_rgb, f"{label} (Confidence: {confidence:.2f})", (100, 90), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+            # Display prediction results on the frame
+            cv2.rectangle(frame_rgb, (100, 100), (400, 400), (0, 255, 0), 2)
+            cv2.putText(frame_rgb, f"{label} (Confidence: {confidence:.2f})", (100, 90), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
 
-        # Show the real-time video with predictions
-        frame_placeholder.image(frame_rgb, channels="RGB", use_column_width=True)
+            # Show the real-time video with predictions
+            frame_placeholder.image(frame_rgb, channels="RGB", use_column_width=True)
 
-        time.sleep(0.5)
+            time.sleep(0.5)
+        else:
+            st.error("Webcam is not initialized.")
 
     # Clean up resources when webcam is stopped
     if not st.session_state.tracking and st.session_state.cap:
