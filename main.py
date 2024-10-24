@@ -219,8 +219,8 @@ def prediction_page():
         upload_image_prediction(model)
     elif selected_feature == "♻️Real":
         real_time_detection(model)
-     elif selected_feature == "♻️Capture":
-         capture_and_predict(model)
+    elif selected_feature == "♻️Capture":
+        capture_and_predict(model)
     else:
         st.write("Please select a feature.")
 
