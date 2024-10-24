@@ -205,7 +205,7 @@ def prediction_page():
     st.title("Waste Detection System")
 
     
-    feature_options = ["♻️Upload", "♻️Real", "♻️Capture"]
+    feature_options = ["♻️Upload",  "♻️Capture"]
     
    
     selected_feature = st.radio(
@@ -217,8 +217,6 @@ def prediction_page():
    
     if selected_feature == "♻️Upload":
         upload_image_prediction(model)
-    elif selected_feature == "♻️Real":
-        real_time_detection(model)
     elif selected_feature == "♻️Capture":
         capture_and_predict(model)
     else:
