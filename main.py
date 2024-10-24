@@ -258,29 +258,36 @@ import cv2
 import numpy as np
 from PIL import Image
 
+import time
+import cv2
+import numpy as np
+from PIL import Image
+
 def real_time_detection(model):
     st.markdown('<h3 style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
 
-    # Webcam start/stop controls
-    start_button = st.button("Start Webcam", key="start_webcam")
-    stop_button = st.button("Stop Webcam", key="stop_webcam")
-
-    # Initialize webcam tracking session
+    # Initialize session_state values if not already set
     if 'tracking' not in st.session_state:
         st.session_state.tracking = False
+    if 'cap' not in st.session_state:
+        st.session_state.cap = None
+
+    # Webcam start/stop controls
+    start_button = st.button("Start Webcam", key="siva_key_1_start")
+    stop_button = st.button("Stop Webcam", key="siva_key_1_stop")
 
     if start_button:
         st.session_state.tracking = True
-        st.session_state.cap = cv2.VideoCapture(0)
+        st.session_state.cap = cv2.VideoCapture(0)  # Initialize webcam
         st.success("Webcam started.")
         
     if stop_button:
         st.session_state.tracking = False
         if st.session_state.cap is not None:
-            st.session_state.cap.release()
+            st.session_state.cap.release()  # Release the webcam
             cv2.destroyAllWindows()
         st.success("Webcam stopped.")
-
+    
     # Placeholder for displaying frames
     frame_placeholder = st.empty()
 
@@ -313,7 +320,9 @@ def real_time_detection(model):
     # Clean up resources when webcam is stopped
     if not st.session_state.tracking and st.session_state.cap:
         st.session_state.cap.release()
+        st.session_state.cap = None
         cv2.destroyAllWindows()
+)
 
 
 def capture_and_predict(model):
