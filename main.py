@@ -253,7 +253,7 @@ def upload_image_prediction(model):
 
 
 
-def real_time_detection(model):
+def  capture_and_predict(model):
     st.markdown('<h3 class="title-gap" style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
 
     # Use Streamlit's camera input for deployment compatibility
@@ -287,6 +287,72 @@ def real_time_detection(model):
 
         except Exception as e:
             st.error(f"Error processing the webcam input: {e}")
+
+
+def real_time_detection(model):
+    st.markdown('<h3 class="title-gap" style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
+
+    # Start and stop buttons to control the video feed
+    start_button = st.button("Start Webcam")
+    stop_button = st.button("Stop Webcam")
+
+    # Initialize session state to track the video capture object and tracking status
+    if 'tracking' not in st.session_state:
+        st.session_state.tracking = False
+
+    # Check if the user clicks "Start Webcam"
+    if start_button:
+        st.session_state.tracking = True
+
+    # Check if the user clicks "Stop Webcam"
+    if stop_button:
+        st.session_state.tracking = False
+
+    # Create a placeholder for the video frames
+    frame_placeholder = st.empty()
+
+    # Use OpenCV to capture video from the webcam and display real-time predictions
+    if st.session_state.tracking:
+        cap = cv2.VideoCapture(0)  # 0 is usually the default webcam
+
+        try:
+            while st.session_state.tracking:
+                ret, frame = cap.read()  # Read a frame from the webcam
+                if not ret:
+                    st.error("Failed to read from webcam.")
+                    break
+
+                # Convert the frame to RGB (from BGR which OpenCV uses)
+                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+                # Extract the region of interest (ROI) for prediction
+                roi = frame_rgb[100:400, 100:400]  # Adjust the size based on your requirements
+
+                # Run your model's prediction on the ROI
+                try:
+                    label, confidence = predict_class(Image.fromarray(roi), model)
+                except Exception as e:
+                    st.error(f"Prediction error: {e}")
+                    break
+
+                # Draw the bounding box and label on the frame
+                cv2.rectangle(frame_rgb, (100, 100), (400, 400), (0, 255, 0), 2)
+                cv2.putText(frame_rgb, f"{label} (Confidence: {confidence:.2f})", (100, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+
+                # Display the updated frame in the Streamlit UI
+                frame_placeholder.image(frame_rgb, channels="RGB", use_column_width=True)
+
+                # Add a slight delay to simulate real-time behavior (reduce CPU load)
+                time.sleep(0.03)
+
+        except Exception as e:
+            st.error(f"Error during webcam processing: {e}")
+        finally:
+            # Release the webcam when stopping
+            cap.release()
+            cv2.destroyAllWindows()
+
+
 
 
 # Feature 3: Capture Image from Webcam and Predict
