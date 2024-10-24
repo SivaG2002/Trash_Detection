@@ -293,13 +293,23 @@ def real_time_detection(model):
     if st.button("Stop Webcam"):
         st.session_state.webcam_on = False
 
-    # Start WebRTC stream only if webcam is on
+    # Use Streamlit's camera input for deployment compatibility
     if st.session_state.webcam_on:
-        webrtc_streamer(key="example", video_transformer=VideoTransformer(model))
-        st.info("WebRTC is streaming your webcam feed. Predictions are being made in real-time.")
+        camera_input = st.camera_input("Capture from your webcam", key="camera")
+
+        # Continue only if the user captures an image from the webcam
+        if camera_input:
+            # Convert image to array and perform predictions
+            image = Image.open(camera_input)
+            label, confidence = predict_class(image, model)
+
+            # Display prediction results
+            st.image(image, caption=f"{label} (Confidence: {confidence:.2f})", use_column_width=True)
+            st.success("Prediction complete.")
+        else:
+            st.info("Webcam is streaming. Capture an image to make a prediction.")
     else:
         st.info("Webcam is off. Click 'Start Webcam' to begin.")
-
 
 
 
