@@ -309,6 +309,68 @@ class VideoTransformer(VideoTransformerBase):
 #     else:
 #         st.info("Webcam is off. Click 'Start Webcam' to begin.")
 
+def capture_and_predict(model):
+    st.markdown('<h3 style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
+
+    if 'tracking' not in st.session_state:
+        st.session_state.tracking = False
+    if 'cap' not in st.session_state:
+        st.session_state.cap = None
+
+    start_button = st.button("Start Webcam", key="siva_key_1_start")
+    stop_button = st.button("Stop Webcam", key="siva_key_1_stop")
+
+    if start_button and not st.session_state.tracking:
+        st.session_state.tracking = True
+        # Try different indices if necessary
+        st.session_state.cap = cv2.VideoCapture(0)  # Change index to 1 or 2 if needed
+
+        if not st.session_state.cap.isOpened():
+            st.error("Failed to open webcam. Please check if another application is using it.")
+            st.session_state.tracking = False
+            st.session_state.cap = None
+        else:
+            # Set resolution
+            st.session_state.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+            st.session_state.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+            st.success("Webcam started.")
+
+    if stop_button and st.session_state.tracking:
+        st.session_state.tracking = False
+        if st.session_state.cap is not None:
+            st.session_state.cap.release()
+            st.session_state.cap = None
+            cv2.destroyAllWindows()
+        st.success("Webcam stopped.")
+
+    frame_placeholder = st.empty()
+
+    while st.session_state.get('tracking', False):
+        if st.session_state.cap is not None:
+            ret, frame = st.session_state.cap.read()
+
+            if not ret:
+                st.error("Failed to capture from webcam.")
+                break
+
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            roi = frame_rgb[100:400, 100:400]
+
+            label, confidence = predict_class(Image.fromarray(roi), model)
+
+            cv2.rectangle(frame_rgb, (100, 100), (400, 400), (0, 255, 0), 2)
+            cv2.putText(frame_rgb, f"{label} (Confidence: {confidence:.2f})", (100, 90),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+
+            frame_placeholder.image(frame_rgb, channels="RGB", use_column_width=True)
+            time.sleep(0.5)
+        else:
+            st.error("Webcam is not initialized.")
+
+    if not st.session_state.tracking and st.session_state.cap:
+        st.session_state.cap.release()
+        st.session_state.cap = None
+        cv2.destroyAllWindows()
 
 
 
