@@ -219,8 +219,8 @@ def prediction_page():
         upload_image_prediction(model)
     elif selected_feature == "♻️Real":
         real_time_detection(model)
-    # elif selected_feature == "♻️Capture":
-    #     capture_and_predict(model)
+     elif selected_feature == "♻️Capture":
+         capture_and_predict(model)
     else:
         st.write("Please select a feature.")
 
@@ -253,7 +253,7 @@ def upload_image_prediction(model):
 
 
 
-def  capture_and_predict(model):
+def capture_and_predict(model):
     st.markdown('<h3 class="title-gap" style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
 
     # Use Streamlit's camera input for deployment compatibility
@@ -291,9 +291,7 @@ def  capture_and_predict(model):
 
 import time
 
-import time
-
-def real_time_detection(model):
+real_time_detection(model):
     st.markdown('<h3 class="title-gap" style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
 
     # Start webcam detection loop
