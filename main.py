@@ -266,12 +266,16 @@ class VideoTransformer(VideoTransformerBase):
 
     def transform(self, frame):
         img = frame.to_ndarray(format="bgr")
-        
+
         # Extract Region of Interest (ROI) for predictions
         roi = img[100:400, 100:400]
 
-        # Perform prediction on the ROI
-        label, confidence = predict_class(Image.fromarray(roi), self.model)
+        try:
+            # Perform prediction on the ROI
+            label, confidence = predict_class(Image.fromarray(roi), self.model)
+        except Exception as e:
+            st.error(f"Error during prediction: {e}")
+            return img  # Return the original image if an error occurs
 
         # Display prediction results on the frame
         cv2.rectangle(img, (100, 100), (400, 400), (0, 255, 0), 2)
@@ -283,6 +287,10 @@ class VideoTransformer(VideoTransformerBase):
 def real_time_detection(model):
     st.markdown('<h3 style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
 
+    # Initialize webcam state in session state
+    if 'webcam_started' not in st.session_state:
+        st.session_state.webcam_started = False
+
     # Add buttons for starting and stopping the webcam feed
     start_button = st.button("Start Webcam")
     stop_button = st.button("Stop Webcam")
@@ -293,20 +301,16 @@ def real_time_detection(model):
         st.session_state.webcam_started = False
 
     # Check the session state to control the WebRTC stream
-    if 'webcam_started' not in st.session_state:
-        st.session_state.webcam_started = False
-
     if st.session_state.webcam_started:
-        # Start WebRTC stream
-        webrtc_streamer(key="example", video_transformer=VideoTransformer(model))
-        st.info("WebRTC is streaming your webcam feed. Predictions are being made in real-time.")
+        try:
+            # Start WebRTC stream
+            webrtc_streamer(key="example", video_transformer=VideoTransformer(model))
+            st.info("WebRTC is streaming your webcam feed. Predictions are being made in real-time.")
+        except Exception as e:
+            st.error(f"Error starting WebRTC: {e}")
     else:
         st.info("Webcam is stopped. Press 'Start Webcam' to begin.")
 
-# Example of how to call the function in your main application
-# if __name__ == "__main__":
-#     model = load_your_model()  # Load your model here
-#     real_time_detection(model)
 
 
 
