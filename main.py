@@ -253,54 +253,68 @@ def upload_image_prediction(model):
 
 
 
+import time
+import cv2
+import numpy as np
+from PIL import Image
+
 def real_time_detection(model):
-    st.markdown('<h3 class="title-gap" style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
+    st.markdown('<h3 style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
 
-    # Start webcam detection without any capture button
-    if st.button("Start Webcam Detection"):
-        st.session_state.tracking = True
+    # Webcam start/stop controls
+    start_button = st.button("Start Webcam", key="start_webcam")
+    stop_button = st.button("Stop Webcam", key="stop_webcam")
 
-    if st.button("Stop Webcam Detection"):
+    # Initialize webcam tracking session
+    if 'tracking' not in st.session_state:
         st.session_state.tracking = False
 
-    # Create a placeholder to show the video frames
+    if start_button:
+        st.session_state.tracking = True
+        st.session_state.cap = cv2.VideoCapture(0)
+        st.success("Webcam started.")
+        
+    if stop_button:
+        st.session_state.tracking = False
+        if st.session_state.cap is not None:
+            st.session_state.cap.release()
+            cv2.destroyAllWindows()
+        st.success("Webcam stopped.")
+
+    # Placeholder for displaying frames
     frame_placeholder = st.empty()
 
-    # Continuously capture frames from the camera in real-time
     while st.session_state.get('tracking', False):
-        camera_input = st.camera_input("Capture real-time frame", key="real_time_camera")
+        ret, frame = st.session_state.cap.read()
 
-        if camera_input:
-            try:
-                # Convert camera input to PIL image
-                img_pil = Image.open(camera_input)
+        if not ret:
+            st.error("Failed to capture from webcam.")
+            break
 
-                # Convert PIL image to NumPy array for OpenCV-like processing
-                frame_rgb = np.array(img_pil)
+        # Convert frame to RGB for Streamlit and OpenCV processing
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-                # Extract the region of interest (ROI) for prediction
-                roi = frame_rgb[100:400, 100:400]  # Adjust the size of ROI
+        # Extract Region of Interest (ROI) for predictions
+        roi = frame_rgb[100:400, 100:400]
 
-                # Run your model's prediction on the ROI
-                label, confidence = predict_class(Image.fromarray(roi), model)
+        # Perform prediction on the ROI
+        label, confidence = predict_class(Image.fromarray(roi), model)
 
-                # Draw bounding box and label on the frame
-                cv2.rectangle(frame_rgb, (100, 100), (400, 400), (0, 255, 0), 2)
-                cv2.putText(frame_rgb, f"{label} (Confidence: {confidence:.2f})", (100, 90),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+        # Display prediction results on the frame
+        cv2.rectangle(frame_rgb, (100, 100), (400, 400), (0, 255, 0), 2)
+        cv2.putText(frame_rgb, f"{label} (Confidence: {confidence:.2f})", (100, 90), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
 
-                # Display the updated frame
-                frame_placeholder.image(frame_rgb, channels="RGB", use_column_width=True)
+        # Show the real-time video with predictions
+        frame_placeholder.image(frame_rgb, channels="RGB", use_column_width=True)
 
-                # Simulate real-time by adding a short delay
-                time.sleep(0.5)
+        time.sleep(0.5)
 
-            except Exception as e:
-                st.error(f"Error processing camera input: {e}")
-                break
+    # Clean up resources when webcam is stopped
+    if not st.session_state.tracking and st.session_state.cap:
+        st.session_state.cap.release()
+        cv2.destroyAllWindows()
 
-        else:
-            st.error("No camera input detected. Make sure your browser has access to the webcam.")
 
 def capture_and_predict(model):
     st.markdown('<h3 class="title-gap" style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
