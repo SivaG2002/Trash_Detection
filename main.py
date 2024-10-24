@@ -283,44 +283,23 @@ class VideoTransformer(VideoTransformerBase):
 def real_time_detection(model):
     st.markdown('<h3 style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
 
-    # Start WebRTC stream
-    webrtc_streamer(key="example", video_transformer=VideoTransformer(model))
+    # Initialize webcam state in session state
+    if "webcam_on" not in st.session_state:
+        st.session_state.webcam_on = False
 
-    st.info("WebRTC is streaming your webcam feed. Predictions are being made in real-time.")
+    # Start/stop webcam based on the session state
+    if st.button("Start Webcam"):
+        st.session_state.webcam_on = True
+    if st.button("Stop Webcam"):
+        st.session_state.webcam_on = False
 
+    # Start WebRTC stream only if webcam is on
+    if st.session_state.webcam_on:
+        webrtc_streamer(key="example", video_transformer=VideoTransformer(model))
+        st.info("WebRTC is streaming your webcam feed. Predictions are being made in real-time.")
+    else:
+        st.info("Webcam is off. Click 'Start Webcam' to begin.")
 
-
-
-def capture_and_predict(model):
-    st.markdown('<h3 class="title-gap" style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
-
-    # Use Streamlit's camera input for deployment compatibility
-    camera_input = st.camera_input("Capture from your webcam", key="camera_input_capture")
-
-    # Continue only if the user captures an image from the webcam
-    if camera_input:
-        try:
-            # Convert the camera input to a PIL image
-            img_pil = Image.open(camera_input)
-            
-            # Convert the PIL image to a NumPy array for OpenCV processing
-            frame_rgb = np.array(img_pil)
-
-            # Extract the region of interest (ROI) as you had before
-            roi = frame_rgb[100:400, 100:400] 
-
-            # Run the model prediction on the ROI
-            label, confidence = predict_class(Image.fromarray(roi), model)
-
-            # Draw bounding box and label with confidence on the frame
-            cv2.rectangle(frame_rgb, (100, 100), (400, 400), (0, 255, 0), 2)
-            cv2.putText(frame_rgb, f"{label} (Confidence: {confidence:.2f})", (100, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
-
-            # Display the processed frame with detection and annotations
-            st.image(frame_rgb, channels="RGB", use_column_width=True)
-
-        except Exception as e:
-            st.error(f"Error processing the webcam input: {e}")
 
 
 
