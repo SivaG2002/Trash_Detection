@@ -278,36 +278,36 @@ class VideoTransformer(VideoTransformerBase):
 
         return img
 
-def real_time_detection(model):
-    st.markdown('<h3 style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
+# def real_time_detection(model):
+#     st.markdown('<h3 style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
 
-    # Initialize webcam state in session state
-    if "webcam_on" not in st.session_state:
-        st.session_state.webcam_on = False
+#     # Initialize webcam state in session state
+#     if "webcam_on" not in st.session_state:
+#         st.session_state.webcam_on = False
 
-    # Start/stop webcam based on the session state
-    if st.button("Start Webcam"):
-        st.session_state.webcam_on = True
-    if st.button("Stop Webcam"):
-        st.session_state.webcam_on = False
+#     # Start/stop webcam based on the session state
+#     if st.button("Start Webcam"):
+#         st.session_state.webcam_on = True
+#     if st.button("Stop Webcam"):
+#         st.session_state.webcam_on = False
 
-    # Use Streamlit's camera input for deployment compatibility
-    if st.session_state.webcam_on:
-        camera_input = st.camera_input("Capture from your webcam", key="camera")
+#     # Use Streamlit's camera input for deployment compatibility
+#     if st.session_state.webcam_on:
+#         camera_input = st.camera_input("Capture from your webcam", key="camera")
 
-        # Continue only if the user captures an image from the webcam
-        if camera_input:
-            # Convert image to array and perform predictions
-            image = Image.open(camera_input)
-            label, confidence = predict_class(image, model)
+#         # Continue only if the user captures an image from the webcam
+#         if camera_input:
+#             # Convert image to array and perform predictions
+#             image = Image.open(camera_input)
+#             label, confidence = predict_class(image, model)
 
-            # Display prediction results
-            st.image(image, caption=f"{label} (Confidence: {confidence:.2f})", use_column_width=True)
-            st.success("Prediction complete.")
-        else:
-            st.info("Webcam is streaming. Capture an image to make a prediction.")
-    else:
-        st.info("Webcam is off. Click 'Start Webcam' to begin.")
+#             # Display prediction results
+#             st.image(image, caption=f"{label} (Confidence: {confidence:.2f})", use_column_width=True)
+#             st.success("Prediction complete.")
+#         else:
+#             st.info("Webcam is streaming. Capture an image to make a prediction.")
+#     else:
+#         st.info("Webcam is off. Click 'Start Webcam' to begin.")
 
 
 
