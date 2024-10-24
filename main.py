@@ -289,115 +289,56 @@ def  capture_and_predict(model):
             st.error(f"Error processing the webcam input: {e}")
 
 
+import time
+
 def real_time_detection(model):
     st.markdown('<h3 class="title-gap" style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
 
-    # Start and stop buttons to control the video feed
-    start_button = st.button("Start Webcam")
-    stop_button = st.button("Stop Webcam")
-
-    # Initialize session state to track the video capture object and tracking status
-    if 'tracking' not in st.session_state:
-        st.session_state.tracking = False
-
-    # Check if the user clicks "Start Webcam"
-    if start_button:
+    # Start webcam detection loop
+    if st.button("Start Webcam Detection"):
         st.session_state.tracking = True
 
-    # Check if the user clicks "Stop Webcam"
-    if stop_button:
+    if st.button("Stop Webcam Detection"):
         st.session_state.tracking = False
 
-    # Create a placeholder for the video frames
+    # Create a placeholder to show the video frames
     frame_placeholder = st.empty()
 
-    # Use OpenCV to capture video from the webcam and display real-time predictions
-    if st.session_state.tracking:
-        cap = cv2.VideoCapture(0)  # 0 is usually the default webcam
+    # Simulate real-time by repeatedly capturing frames from the camera
+    while st.session_state.get('tracking', False):
+        camera_input = st.camera_input("Capture a frame")
 
-        try:
-            while st.session_state.tracking:
-                ret, frame = cap.read()  # Read a frame from the webcam
-                if not ret:
-                    st.error("Failed to read from webcam.")
-                    break
+        if camera_input:
+            try:
+                # Convert camera input to PIL image
+                img_pil = Image.open(camera_input)
 
-                # Convert the frame to RGB (from BGR which OpenCV uses)
-                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                # Convert PIL image to NumPy array for OpenCV-like processing
+                frame_rgb = np.array(img_pil)
 
                 # Extract the region of interest (ROI) for prediction
-                roi = frame_rgb[100:400, 100:400]  # Adjust the size based on your requirements
+                roi = frame_rgb[100:400, 100:400]  # Adjust the size of ROI
 
                 # Run your model's prediction on the ROI
-                try:
-                    label, confidence = predict_class(Image.fromarray(roi), model)
-                except Exception as e:
-                    st.error(f"Prediction error: {e}")
-                    break
+                label, confidence = predict_class(Image.fromarray(roi), model)
 
-                # Draw the bounding box and label on the frame
+                # Draw bounding box and label on the frame
                 cv2.rectangle(frame_rgb, (100, 100), (400, 400), (0, 255, 0), 2)
-                cv2.putText(frame_rgb, f"{label} (Confidence: {confidence:.2f})", (100, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+                cv2.putText(frame_rgb, f"{label} (Confidence: {confidence:.2f})", (100, 90),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
 
-                # Display the updated frame in the Streamlit UI
+                # Display the updated frame
                 frame_placeholder.image(frame_rgb, channels="RGB", use_column_width=True)
 
-                # Add a slight delay to simulate real-time behavior (reduce CPU load)
-                time.sleep(0.03)
+                # Simulate real-time by adding a short delay
+                time.sleep(0.5)
 
-        except Exception as e:
-            st.error(f"Error during webcam processing: {e}")
-        finally:
-            # Release the webcam when stopping
-            cap.release()
-            cv2.destroyAllWindows()
+            except Exception as e:
+                st.error(f"Error processing camera input: {e}")
+                break
 
-
-
-
-# Feature 3: Capture Image from Webcam and Predict
-# def capture_and_predict(model):
-#     st.title("Capture Image from Webcam and Predict")
-
-#     start_button = st.button("Start Webcam")
-#     capture_button = st.button("Capture Image")
-#     stop_button = st.button("Stop Webcam")
-
-#     if 'cap' not in st.session_state:
-#         st.session_state.cap = None
-#     if 'tracking' not in st.session_state:
-#         st.session_state.tracking = False
-
-#     if start_button and not st.session_state.tracking:
-#         st.session_state.cap = cv2.VideoCapture(0)
-#         if st.session_state.cap.isOpened():
-#             st.session_state.tracking = True
-#             st.success("Webcam started.")
-#         else:
-#             st.error("Failed to open webcam.")
-
-#     if stop_button and st.session_state.tracking:
-#         st.session_state.tracking = False
-#         if st.session_state.cap is not None and st.session_state.cap.isOpened():
-#             st.session_state.cap.release()
-#             st.session_state.cap = None
-#             st.success("Webcam stopped.")
-
-#     frame_placeholder = st.empty()
-
-#     if st.session_state.tracking and st.session_state.cap is not None and st.session_state.cap.isOpened():
-#         ret, frame = st.session_state.cap.read()
-#         if not ret:
-#             st.error("Failed to read from webcam.")
-#             return
-
-#         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-#         frame_placeholder.image(frame_rgb, channels="RGB", use_column_width=True)
-
-#         if capture_button:
-#             captured_image = Image.fromarray(frame_rgb)
-#             label, confidence = predict_class(captured_image, model)  # Pass the model
-#             st.write(f"**Prediction for Captured Image: {label} (Confidence: {confidence:.2f})**")
+        else:
+            st.error("No camera input detected. Make sure your browser has access to the webcam.")
 
 
 
