@@ -322,7 +322,6 @@ def real_time_detection(model):
         st.session_state.cap.release()
         st.session_state.cap = None
         cv2.destroyAllWindows()
-)
 
 
 def capture_and_predict(model):
