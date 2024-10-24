@@ -270,12 +270,8 @@ class VideoTransformer(VideoTransformerBase):
         # Extract Region of Interest (ROI) for predictions
         roi = img[100:400, 100:400]
 
-        try:
-            # Perform prediction on the ROI
-            label, confidence = predict_class(Image.fromarray(roi), self.model)
-        except Exception as e:
-            st.error(f"Error during prediction: {e}")
-            return img  # Return the original image if an error occurs
+        # Perform prediction on the ROI
+        label, confidence = predict_class(Image.fromarray(roi), self.model)
 
         # Display prediction results on the frame
         cv2.rectangle(img, (100, 100), (400, 400), (0, 255, 0), 2)
@@ -283,14 +279,14 @@ class VideoTransformer(VideoTransformerBase):
                     (100, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
 
         return img
+
 def real_time_detection(model):
     st.markdown('<h3 style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
 
-    # Start WebRTC stream without custom transformer
-    webrtc_streamer(key="example")
+    # Start WebRTC stream
+    webrtc_streamer(key="example", video_transformer=VideoTransformer(model))
 
-    st.info("WebRTC is streaming your webcam feed. Predictions will be made in real-time.")
-
+    st.info("WebRTC is streaming your webcam feed. Predictions are being made in real-time.")
 
 
 
