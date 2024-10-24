@@ -291,6 +291,8 @@ def  capture_and_predict(model):
 
 import time
 
+import time
+
 def real_time_detection(model):
     st.markdown('<h3 class="title-gap" style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
 
@@ -306,7 +308,7 @@ def real_time_detection(model):
 
     # Simulate real-time by repeatedly capturing frames from the camera
     while st.session_state.get('tracking', False):
-        camera_input = st.camera_input("Capture a frame")
+        camera_input = st.camera_input("Capture a frame", key="camera_input_key")
 
         if camera_input:
             try:
@@ -339,6 +341,7 @@ def real_time_detection(model):
 
         else:
             st.error("No camera input detected. Make sure your browser has access to the webcam.")
+
 
 
 
