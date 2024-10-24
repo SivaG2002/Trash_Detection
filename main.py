@@ -283,33 +283,14 @@ class VideoTransformer(VideoTransformerBase):
                     (100, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
 
         return img
-
 def real_time_detection(model):
     st.markdown('<h3 style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
 
-    # Initialize webcam state in session state
-    if 'webcam_started' not in st.session_state:
-        st.session_state.webcam_started = False
+    # Start WebRTC stream without custom transformer
+    webrtc_streamer(key="example")
 
-    # Add buttons for starting and stopping the webcam feed
-    start_button = st.button("Start Webcam")
-    stop_button = st.button("Stop Webcam")
+    st.info("WebRTC is streaming your webcam feed. Predictions will be made in real-time.")
 
-    if start_button:
-        st.session_state.webcam_started = True
-    if stop_button:
-        st.session_state.webcam_started = False
-
-    # Check the session state to control the WebRTC stream
-    if st.session_state.webcam_started:
-        try:
-            # Start WebRTC stream
-            webrtc_streamer(key="example", video_transformer=VideoTransformer(model))
-            st.info("WebRTC is streaming your webcam feed. Predictions are being made in real-time.")
-        except Exception as e:
-            st.error(f"Error starting WebRTC: {e}")
-    else:
-        st.info("Webcam is stopped. Press 'Start Webcam' to begin.")
 
 
 
