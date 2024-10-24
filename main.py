@@ -258,11 +258,6 @@ import cv2
 import numpy as np
 from PIL import Image
 
-import time
-import cv2
-import numpy as np
-from PIL import Image
-
 def real_time_detection(model):
     st.markdown('<h3 style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
 
@@ -276,13 +271,17 @@ def real_time_detection(model):
 
     if start_button and not st.session_state.tracking:
         st.session_state.tracking = True
-        st.session_state.cap = cv2.VideoCapture(0)
+        # Try different indices if necessary
+        st.session_state.cap = cv2.VideoCapture(0)  # Change index to 1 or 2 if needed
 
         if not st.session_state.cap.isOpened():
             st.error("Failed to open webcam. Please check if another application is using it.")
             st.session_state.tracking = False
             st.session_state.cap = None
         else:
+            # Set resolution
+            st.session_state.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+            st.session_state.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
             st.success("Webcam started.")
 
     if stop_button and st.session_state.tracking:
