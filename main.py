@@ -256,19 +256,19 @@ def upload_image_prediction(model):
 def real_time_detection(model):
     st.markdown('<h3 class="title-gap" style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
 
-    # Unique keys for start/stop buttons
-    if st.button("Start Webcam Detection", key="start_button"):
+    # Start webcam detection without any capture button
+    if st.button("Start Webcam Detection"):
         st.session_state.tracking = True
 
-    if st.button("Stop Webcam Detection", key="stop_button"):
+    if st.button("Stop Webcam Detection"):
         st.session_state.tracking = False
 
     # Create a placeholder to show the video frames
     frame_placeholder = st.empty()
 
-    # Simulate real-time by repeatedly capturing frames from the camera
+    # Continuously capture frames from the camera in real-time
     while st.session_state.get('tracking', False):
-        camera_input = st.camera_input("Capture a frame", key="camera_input_real_time")
+        camera_input = st.camera_input("Capture real-time frame", key="real_time_camera")
 
         if camera_input:
             try:
@@ -301,7 +301,6 @@ def real_time_detection(model):
 
         else:
             st.error("No camera input detected. Make sure your browser has access to the webcam.")
-
 
 def capture_and_predict(model):
     st.markdown('<h3 class="title-gap" style="text-align: center;">Real-time Detection from Webcam</h3>', unsafe_allow_html=True)
