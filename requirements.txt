@@ -4,4 +4,4 @@ keras
 opencv-python-headless
 numpy
 matplotlib
-streamlit-webrt
+streamlit-webrtc
