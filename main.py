@@ -127,6 +127,7 @@ import numpy as np
 from PIL import Image
 from tensorflow.keras.models import load_model
 import time
+from streamlit_webrtc import webrtc_streamer
 # Load your trained model
 model = load_model('assets/models/model.h5')
 
