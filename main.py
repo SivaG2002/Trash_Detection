@@ -230,17 +230,20 @@ class VideoProcessor:
     def recv(self, frame):
         # Convert the frame to a numpy array
         frm = frame.to_ndarray(format="bgr24")
-        
+
         if frm is None or frm.size == 0:
             print("Received an empty frame!")
             return frame  # Return original frame if empty
 
+        # Convert from BGR to RGB for prediction
+        frm_rgb = cv2.cvtColor(frm, cv2.COLOR_BGR2RGB)
+
         # Get prediction and label
-        label, confidence = predict_class(frm, model)
+        label, confidence = predict_class(Image.fromarray(frm_rgb), model)
 
         # Display the prediction on the frame
         cv2.putText(frm, f"{label} ({confidence:.2f})", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-        
+
         return av.VideoFrame.from_ndarray(frm, format="bgr24")
 
 def live(model):
