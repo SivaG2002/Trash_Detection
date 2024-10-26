@@ -231,9 +231,13 @@ class VideoProcessor:
         # Convert the frame to a numpy array
         frm = frame.to_ndarray(format="bgr24")
         
+        if frm is None or frm.size == 0:
+            print("Received an empty frame!")
+            return frame  # Return original frame if empty
+
         # Get prediction and label
         label, confidence = predict_class(frm, model)
-        
+
         # Display the prediction on the frame
         cv2.putText(frm, f"{label} ({confidence:.2f})", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         
