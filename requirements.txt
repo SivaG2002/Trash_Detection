@@ -6,3 +6,4 @@ numpy
 matplotlib
 streamlit-webrtc
 twilio
+folium
