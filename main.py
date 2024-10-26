@@ -205,7 +205,7 @@ def prediction_page():
     st.title("Waste Detection System")
 
     
-    feature_options = ["♻️Upload",  "♻️Capture"]
+    feature_options = ["♻️Upload",  "♻️Capture,♻️Live"]
     
    
     selected_feature = st.radio(
@@ -219,11 +219,28 @@ def prediction_page():
         upload_image_prediction(model)
     elif selected_feature == "♻️Capture":
         capture_and_predict(model)
+     elif selected_feature == "♻️Live":
+        live(model)  
     else:
         st.write("Please select a feature.")
 
 
+class VideoProcessor:
+    def recv(self, frame):
+        # Convert the frame to a numpy array
+        frm = frame.to_ndarray(format="bgr24")
+        
+        # Get prediction and label
+        label, confidence = predict_class(frm, model)
+        
+        # Display the prediction on the frame
+        cv2.putText(frm, f"{label} ({confidence:.2f})", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        
+        return av.VideoFrame.from_ndarray(frm, format="bgr24")
 
+def live(model):
+    st.markdown('<h3 style="text-align: center;">Real-time Waste Classification</h3>', unsafe_allow_html=True)
+    webrtc_streamer(key="waste_classification", video_processor_factory=VideoProcessor)
 
 
 
