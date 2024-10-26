@@ -130,7 +130,7 @@ import time
 from streamlit_webrtc import webrtc_streamer
 # Load your trained model
 model = load_model('assets/models/model.h5')
-
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 def preprocess_image(img):
     # Convert image to RGB and resize to 150x150 as expected by the model
