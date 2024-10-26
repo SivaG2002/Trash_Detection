@@ -221,10 +221,6 @@ def prediction_page():
 
 
 
-def live(model):
-    st.markdown('<h3 style="text-align: center;">Real-time Waste Classification</h3>', unsafe_allow_html=True)
-    webrtc_streamer(key="waste_classification", video_processor_factory=VideoProcessor)
-
 
 
 def upload_image_prediction(model):
@@ -318,7 +314,7 @@ def capture_and_predict(model):
 
 @st.cache_resource
 def load_your_model():
-    model = load_model('your_model_path.h5')  # Replace with your model's path
+    model = load_model('assets/models/model.h5')  # Replace with your model's path
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
     return model  
 
