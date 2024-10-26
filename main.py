@@ -205,7 +205,7 @@ def prediction_page():
     st.title("Waste Detection System")
 
     
-    feature_options = ["♻️Upload",  "♻️Capture,♻️Live"]
+    feature_options = ["♻️Upload", "♻️Capture","♻️Live"]
     
    
     selected_feature = st.radio(
