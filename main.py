@@ -320,7 +320,7 @@ def capture_and_predict(model):
 
 import gradio as gr
 gradio_interface = gr.Interface(
-    fn=predict, 
+    fn=predict_class(), 
     inputs=gr.inputs.Image(type="numpy"), 
     outputs="text",  # Change to "label" or "text" based on your output needs
     live=True
