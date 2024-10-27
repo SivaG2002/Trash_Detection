@@ -343,7 +343,7 @@ def launch_gradio_app():
     gradio_interface.launch(share=False)  # Set share=True for public access
 
 # Streamlit function to display Gradio interface
-def live():
+def live(model):
     st.title("Live Prediction with Gradio")
     # Launch Gradio app
     # You may need to save the output of launch to avoid any issues with embedding
