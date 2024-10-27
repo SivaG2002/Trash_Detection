@@ -124,6 +124,7 @@ import time
 from streamlit_webrtc import webrtc_streamer
 # Load your trained model
 model = load_model('assets/models/model.h5')
+model.compile(metrics=['accuracy'])
 
 
 def preprocess_image(img):
