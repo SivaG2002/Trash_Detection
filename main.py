@@ -122,7 +122,7 @@ from PIL import Image
 from tensorflow.keras.models import load_model
 import time
 from streamlit_webrtc import webrtc_streamer
-
+import tensorflow as tf
 
 
 def load_model():
