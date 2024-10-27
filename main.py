@@ -331,23 +331,18 @@ def capture_and_predict(model):
             st.error(f"Error processing the webcam input: {e}")
 
 import gradio as gr
-gradio_interface = gr.Interface(
-    fn=predict,
-    inputs=gr.Image(type="numpy"),  # Updated here
-    outputs="text",  # Output type
-    live=True
-)
-
-# Function to launch Gradio app
 def launch_gradio_app():
     gradio_interface.launch(share=False, inline=True)  # Inline mode
 
 # Streamlit function to display Gradio interface
 def live(model):
     st.title("Live Prediction with Gradio")
+    
+    # Launch Gradio interface and get the HTML for embedding
+    gradio_html = gradio_interface.launch(prevent_thread_lock=True)
 
-    # Launch Gradio in a separate thread
-    launch_gradio_app()
+    # Embed Gradio in Streamlit using HTML component
+    st.components.v1.html(gradio_html, height=600)
 
 
 
