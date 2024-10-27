@@ -312,38 +312,46 @@ def capture_and_predict(model):
             st.error(f"Error processing the webcam input: {e}")
 
 
-@st.cache_resource
-def load_your_model():
-    model = load_model('assets/models/model.h5')  # Replace with your model's path
-    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-    return model  
 
-class VideoProcessor:
-    def __init__(self, model):
-        self.model = model
-
-    def recv(self, frame):
-        frm = frame.to_ndarray(format="bgr24")
-
-        if frm is None or frm.size == 0:
-            print("Received an empty frame!")
-            return frame  # Return original frame if empty
-
-        # Convert from BGR to RGB for prediction
-        frm_rgb = cv2.cvtColor(frm, cv2.COLOR_BGR2RGB)
-
-        # Get prediction and label
-        label, confidence = predict_class(Image.fromarray(frm_rgb), self.model)
-
-        # Display the prediction on the frame
-        cv2.putText(frm, f"{label} ({confidence:.2f})", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-
-        return av.VideoFrame.from_ndarray(frm, format="bgr24")
+      
+import cv2
+import av
+from streamlit_webrtc import webrtc_streamer, RTCConfiguration
+import streamlit as st
+import numpy as np
 
 def live(model):
-    st.markdown('<h3 style="text-align: center;">Real-time Waste Classification</h3>', unsafe_allow_html=True)
-    webrtc_streamer(key="waste_classification", video_processor_factory=lambda: VideoProcessor(model))
+    class VideoProcessor:
+        def recv(self, frame):
+            # Convert frame to OpenCV format
+            frm = frame.to_ndarray(format="bgr24")
 
+            # Preprocess the frame for the model
+            img_rgb = cv2.cvtColor(frm, cv2.COLOR_BGR2RGB)
+            img_resized = cv2.resize(img_rgb, (150, 150))  # Adjust if your model needs a different size
+            img_normalized = img_resized / 255.0
+            img_input = np.expand_dims(img_normalized, axis=0)
+
+            # Model prediction
+            prediction = model.predict(img_input)
+            result = "Recyclable" if prediction[0][0] > 0.5 else "Organic"
+
+            # Display the prediction on the frame
+            cv2.putText(frm, f"Prediction: {result}", (10, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+
+            return av.VideoFrame.from_ndarray(frm, format='bgr24')
+
+    # Configure the WebRTC streamer
+    webrtc_streamer(
+        key="siva_key_1",
+        video_processor_factory=VideoProcessor,
+        rtc_configuration=RTCConfiguration(
+            {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
+        )
+    )
+
+   
     
 
 
