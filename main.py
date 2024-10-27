@@ -122,9 +122,17 @@ from PIL import Image
 from tensorflow.keras.models import load_model
 import time
 from streamlit_webrtc import webrtc_streamer
-# Load your trained model
-model = load_model('assets/models/model.h5')
-model.compile(metrics=['accuracy'])
+
+
+
+def load_model():
+    # Load the model
+    model = tf.keras.models.load_model("assets/models/model.h5')
+    model.compile(optimizer='adam', metrics=['accuracy'])  # Add any metrics you want to track
+
+    return model
+
+model = load_model()
 
 
 def preprocess_image(img):
