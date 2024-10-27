@@ -127,7 +127,7 @@ from streamlit_webrtc import webrtc_streamer
 
 def load_model():
     # Load the model
-    model = tf.keras.models.load_model("assets/models/model.h5')
+    model = tf.keras.models.load_model('assets/models/model.h5')
     model.compile(optimizer='adam', metrics=['accuracy'])  # Add any metrics you want to track
 
     return model
