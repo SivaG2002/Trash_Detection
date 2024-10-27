@@ -319,47 +319,19 @@ def capture_and_predict(model):
             st.error(f"Error processing the webcam input: {e}")
 
 
+import gradio as gr
+gradio_interface = gr.Interface(fn=predict, 
+                                 inputs=gr.inputs.Image(type="numpy"), 
+                                 outputs="label", 
+                                 live=True)
 
-      
-import cv2
-import av
-from streamlit_webrtc import webrtc_streamer, RTCConfiguration
-import streamlit as st
-import numpy as np
+def launch_gradio_app():
+    gradio_interface.launch(share=True)    
 
-def live(model):
-    class VideoProcessor:
-        def recv(self, frame):
-            # Convert frame to OpenCV format
-            frm = frame.to_ndarray(format="bgr24")
+def live():
+  st.title("Live Prediction with Gradio")
+  st.components.v1.html(gradio_interface.launch(share=True), height=600)
 
-            # Preprocess the frame for the model
-            img_rgb = cv2.cvtColor(frm, cv2.COLOR_BGR2RGB)
-            img_resized = cv2.resize(img_rgb, (150, 150))  # Adjust if your model needs a different size
-            img_normalized = img_resized / 255.0
-            img_input = np.expand_dims(img_normalized, axis=0)
-
-            # Model prediction
-            prediction = model.predict(img_input)
-            result = "Recyclable" if prediction[0][0] > 0.5 else "Organic"
-
-            # Display the prediction on the frame
-            cv2.putText(frm, f"Prediction: {result}", (10, 30),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-
-            return av.VideoFrame.from_ndarray(frm, format='bgr24')
-
-    # Configure the WebRTC streamer
-    webrtc_streamer(
-        key="siva_key_1",
-        video_processor_factory=VideoProcessor,
-        rtc_configuration=RTCConfiguration(
-            {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
-        )
-    )
-
-   
-    
 
 
 
