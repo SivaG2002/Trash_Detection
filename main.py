@@ -159,7 +159,19 @@ def predict_class(img, model, threshold=0.5):
         return "Recyclable", prediction[0][0]
     else:
         return "Organic", prediction[0][0]
+def predict(image):
+    # Preprocess the image for your model
+    image = cv2.resize(image, (150, 150))  # Resize to the input size of your model
+    image = np.array(image)  # Ensure the image is a NumPy array
+    image = np.expand_dims(image, axis=0)  # Add batch dimension
+    image = image / 255.0  # Normalize if required by your model
+    
+    # Make predictions
+    prediction = model.predict(image)
 
+    # Assuming your model outputs class probabilities
+    class_index = np.argmax(prediction)  # Get the index of the highest probability
+    return f"Predicted Class: {class_index}"  # Modify this to return meaningful output
 
 def prediction_page():
     st.markdown(
@@ -320,7 +332,7 @@ def capture_and_predict(model):
 
 import gradio as gr
 gradio_interface = gr.Interface(
-    fn=predict_class(), 
+    fn=predict, 
     inputs=gr.inputs.Image(type="numpy"), 
     outputs="text",  # Change to "label" or "text" based on your output needs
     live=True
