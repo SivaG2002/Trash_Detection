@@ -330,6 +330,12 @@ def capture_and_predict(model):
         except Exception as e:
             st.error(f"Error processing the webcam input: {e}")
 
+gradio_interface = gr.Interface(
+    fn=predict,
+    inputs=gr.Image(type="numpy"),
+    outputs="text",
+    live=True
+)
 import gradio as gr
 def launch_gradio_app():
     gradio_interface.launch(share=False, inline=True)  # Inline mode
