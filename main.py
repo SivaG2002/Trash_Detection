@@ -124,7 +124,7 @@ import time
 from streamlit_webrtc import webrtc_streamer
 import tensorflow as tf
 
-
+@st.cache_resource
 def load_model():
     # Load the model
     model = tf.keras.models.load_model('assets/models/model.h5')
