@@ -318,7 +318,7 @@ def capture_and_predict(model):
         except Exception as e:
             st.error(f"Error processing the webcam input: {e}")
 
-
+import gradio as gr
 gradio_interface = gr.Interface(
     fn=predict, 
     inputs=gr.inputs.Image(type="numpy"), 
