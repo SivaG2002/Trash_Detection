@@ -340,17 +340,14 @@ gradio_interface = gr.Interface(
 
 # Function to launch Gradio app
 def launch_gradio_app():
-    gradio_interface.launch(share=False)  # Set share=True for public access
+    gradio_interface.launch(share=False, inline=True)  # Inline mode
 
 # Streamlit function to display Gradio interface
 def live(model):
     st.title("Live Prediction with Gradio")
-    # Launch Gradio app
-    # You may need to save the output of launch to avoid any issues with embedding
-    gradio_html = gradio_interface.launch(prevent_thread_lock=True)
-    
-    # Embed Gradio in Streamlit
-    st.components.v1.html(gradio_html, height=600)
+
+    # Launch Gradio in a separate thread
+    launch_gradio_app()
 
 
 
